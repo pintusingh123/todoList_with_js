@@ -16,11 +16,11 @@
     <div class="h-screen  grid md:grid-cols-2 gap-2 ">
         <!-- left div start -->
         <div class="h-screen">
-            <img class="h-full animate__animated animate__backInLeft " src="./imgs/todo-2.avif" alt="not found img">
+            <img class="h-full   " src="./imgs/todo-2.avif" alt="not found img">
         </div>
         <!-- left div end -->
         <!-- right div start -->
-        <div class=" py-2 px-5  animate__animated animate__backInRight ">
+        <div class=" py-2 px-5    ">
             <!-- div for heading  -->
             <div class="  w-11/12 mx-auto  flex py-5 flex-col  justify-center items-center ">
                 <div class="w-16   h-16 bg-blue-100 flex items-center justify-center rounded-full mx-auto mb-4">
@@ -76,47 +76,8 @@
                         </thead>
 
                         <!-- Table Body -->
-                        <tbody class="text-gray-700">
-
-                            <!-- rows -->
-                            <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="p-3 font-medium">1</td>
-                                <td class="p-3">Upload html new file</td>
-
-                                <td class="p-3">
-                                    <div class="flex justify-center gap-4 text-lg">
-
-                                        <button class="text-blue-600 hover:text-blue-800">
-                                            <i class="ri-pencil-fill"></i>
-                                        </button>
-
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="ri-delete-bin-2-fill"></i>
-                                        </button>
-
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- rows -->
-                            <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="p-3 font-medium">1</td>
-                                <td class="p-3">Upload html new file</td>
-
-                                <td class="p-3">
-                                    <div class="flex justify-center gap-4 text-lg">
-
-                                        <button class="text-blue-600 hover:text-blue-800">
-                                            <i class="ri-pencil-fill"></i>
-                                        </button>
-
-                                        <button class="text-red-500 hover:text-red-700">
-                                            <i class="ri-delete-bin-2-fill"></i>
-                                        </button>
-
-                                    </div>
-                                </td>
-                            </tr>
-
+                        <tbody id="taskContainer" class="text-gray-700">  
+                            <!-- we added task here dynamicly -->
                         </tbody>
 
                     </table>
