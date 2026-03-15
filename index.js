@@ -1,48 +1,75 @@
-//for automatic calling fun when page is open
+ // ================= PAGE LOAD =================
+
+// window.onload -> page load hote hi ye function automatically run hota hai
+// iska use hum yaha localStorage se tasks fetch karke UI me show karne ke liye kar rahe hain
 window.onload = () => {
     fetchTask()
 }
 
-//this fun used for Open Task box form and calling createTask here
-const OpenPopUP = () => {
-    new Swal({
 
+// ================= OPEN ADD TASK POPUP =================
+
+// ye function SweetAlert2 popup open karta hai jisme task add karne ka form hota hai
+// form submit hone par createTask(event) function call hota hai
+const OpenPopUP = () => {
+
+    new Swal({
         html:
-            `<div class="text-left" >
-              <h1 class="text-xl font-semibold text-black">Add a new Task </h1>
+            `<div class="text-left">
+              <h1 class="text-xl font-semibold text-black">Add a new Task</h1>
+
+          <!-- Task Create Form -->
           <form onsubmit="createTask(event)" class="flex flex-col md:flex-row mt-2 gap-3">
+
+            <!-- Task Input -->
             <input
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
             type="text"
             name="task"
             id="task"
             placeholder="Enter your task..."
-        >
+            >
 
-        <!-- Button -->
-        <button type="submit" id="btn"
-            class="bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-1"
+        <!-- Submit Button -->
+        <button type="submit"
+            class="bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
         >
             <i class="ri-add-line"></i>
             Add
         </button>
 
     </form>
-              </div>`,
-        showConfirmButton: false, //used for hidden ok btn in popup box
+    </div>`,
+
+        // SweetAlert ka default OK button hide karne ke liye
+        showConfirmButton: false,
     })
 }
 
 
 
+// ================= CREATE TASK =================
+
+// ye function tab run hota hai jab user task add form submit karta hai
 function createTask(e) {
+
+    // form submit hone par page reload hone se rokne ke liye
     e.preventDefault();
 
+    // SweetAlert popup ke andar se input field select kar rahe hain
     const input = Swal.getPopup().querySelector("#task");
+
+    // input value le rahe hain aur extra spaces remove kar rahe hain
     const task = input.value.trim();
+
+    // Date.now() se unique key generate kar rahe hain
     let key = Date.now();
+
+    // localStorage me task save kar rahe hain
     localStorage.setItem(key, task);
 
+
+    // agar user empty task submit kare
     if (task === "") {
         Swal.fire({
             icon: "warning",
@@ -51,132 +78,183 @@ function createTask(e) {
         return
     }
 
+    // success notification
     Swal.fire({
         title: "Created Task",
         icon: "success",
-
         toast: true,
         showConfirmButton: false,
         timer: 1000,
         timerProgressBar: true,
         position: "top-end"
-    }).then(() => {
-        location.reload(); //used for when we added data then page reload for data show on the ui
     })
+
+        // notification ke baad page reload kar rahe hain
+        .then(() => {
+            location.reload();
+        })
 }
 
-//fetching data from local storage =>
-// page on hote hi kisi fun ko call krna ho to js ke top pr  window.onload =() =>{funName()}
-const fetchTask = () => {
-    //finding localstorage length using OBject.keys()
-    const keys = Object.keys(localStorage); //it return all length of localstorage in  array formate
 
-    //select taskcontainer
+
+// ================= FETCH TASKS =================
+
+// ye function localStorage se sab tasks lekar UI me show karta hai
+const fetchTask = () => {
+
+    // Object.keys() se localStorage ki sari keys array me mil jati hain
+    const keys = Object.keys(localStorage);
+
+    // table ka container select kar rahe hain
     const taskContainer = document.getElementById("taskContainer")
 
-
-    //we looping for get seperatly key's
+    // task numbering ke liye counter
     let i = 1;
+
+    // har key ke liye loop chal raha hai
     for (let key of keys) {
+
+        // key se related task value get kar rahe hain
         const task = localStorage.getItem(key);
+
+        // UI template bana rahe hain
         const ui = ` 
-                  <tr class="border-b hover:bg-blue-50 transition">
-                                <td class="p-3 font-medium">${i}</td>
-                                <td class="p-3">${task}</td>
+        <tr class="border-b hover:bg-blue-50 transition">
 
-                                <td class="p-3">
-                                    <div class="flex justify-center gap-4 text-lg">
+            <td class="p-3 font-medium">${i}</td>
 
-                                        <button onclick="UpdateTask('${key}')" class="text-blue-600 hover:text-blue-800">
-                                            <i class="ri-pencil-fill"></i>
-                                        </button>
+            <td class="p-3">${task}</td>
 
-                                        <button id='remove' onclick="removeTask('${key}')" class="text-red-500 hover:text-red-700">
-                                            <i class="ri-delete-bin-2-fill"></i>
-                                        </button>
+            <td class="p-3">
 
-                                    </div>
-                                </td>
-                            </tr>
-                            `
-        // ui mai jo taskcontainer hai usme ise pass kar rhe hai 
-        taskContainer.innerHTML += ui  //we use += for dont lossing our older task data 
-        //update idex value of task=>
+                <div class="flex justify-center gap-4 text-lg">
+
+                    <!-- Update Button -->
+                    <button onclick="UpdateTask('${key}')" class="text-blue-600">
+                        <i class="ri-pencil-fill"></i>
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button onclick="removeTask('${key}')" class="text-red-500">
+                        <i class="ri-delete-bin-2-fill"></i>
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+        `
+
+        // += ka use kar rahe hain taaki purane tasks delete na ho
+        taskContainer.innerHTML += ui
+
+        // index number increase
         i = i + 1;
     }
 
 }
 
-//delet items 
+
+
+// ================= DELETE TASK =================
+
+// ye function specific task delete karta hai
 const removeTask = (key) => {
 
+    // localStorage se task remove
     localStorage.removeItem(key)
-    location.reload() //rable refresh karne ke liye
-    // console.log(key);
 
+    // UI refresh karne ke liye page reload
+    location.reload()
 
 }
 
-//update task => 
+
+
+// ================= OPEN UPDATE POPUP =================
+
+// ye function edit popup open karta hai
 function UpdateTask(key_id) {
- 
+
+    // localStorage se current task value le rahe hain
     let InputValue = localStorage.getItem(key_id)
-    // console.log(InputValue);
 
     new Swal({
 
         html:
-            `<div class="text-left" >
-              <h1 class="text-xl font-semibold text-black">Edit Tast</h1>
-          <form onsubmit="SaveUpdateTask(event,'${key_id}' )" class="flex flex-col md:flex-row mt-2 gap-3">
+            `<div class="text-left">
+
+              <h1 class="text-xl font-semibold text-black">Edit Task</h1>
+
+          <!-- Update Form -->
+          <form onsubmit="SaveUpdateTask(event,'${key_id}')" class="flex flex-col md:flex-row mt-2 gap-3">
+
+            <!-- Input me existing task value show kar rahe hain -->
             <input
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
             type="text"
-            name="task"
             id="editTask"
             placeholder="Update your task..."
             value="${InputValue}"
-        >
+            >
 
-        <!-- Button -->
-        <button type="submit" id="save-btn"
-            class="bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-1"
+        <!-- Save Button -->
+        <button type="submit"
+            class="bg-gray-800 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
         >
-            <i class="ri-add-line"></i>
             Save
         </button>
 
     </form>
-              </div>`,
-        showConfirmButton: false, //used for hidden ok btn in popup box
-    })
- 
-    
+    </div>`,
 
+        showConfirmButton: false,
+    })
 }
 
-function SaveUpdateTask(e,key_id){
+
+
+// ================= SAVE UPDATED TASK =================
+
+// ye function updated task ko localStorage me save karta hai
+function SaveUpdateTask(e, key_id) {
+
+    // page reload rokne ke liye
     e.preventDefault()
+
+    // popup ke input field se value lena
     const inputBox = Swal.getPopup().querySelector("#editTask");
+
     const updateTask = inputBox.value.trim();
 
-    if(updateTask === ""){
+
+    // empty task validation
+    if (updateTask === "") {
+
         Swal.fire({
-            icon:"warning",
-            title:"Task cannot be empty"
+            icon: "warning",
+            title: "Task cannot be empty"
         })
+
         return
     }
-    // but agr sahi hai sab kuch to 
-    localStorage.setItem(key_id,updateTask);
+
+    // same key me new value update kar rahe hain
+    localStorage.setItem(key_id, updateTask);
+
+    // success message
     Swal.fire({
-        title:"Task Updated",
-        icon:"success",
-        toast:true,
-        timer:1000,
-        showConfirmButton:false,
-        position:"top-end",
-    }).then(()=>{
-        location.reload();
+        title: "Task Updated",
+        icon: "success",
+        toast: true,
+        timer: 1000,
+        showConfirmButton: false,
+        position: "top-end",
     })
+
+        // success ke baad UI reload
+        .then(() => {
+            location.reload();
+        })
 }
