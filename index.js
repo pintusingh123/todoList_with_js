@@ -1,9 +1,11 @@
+ 
 // ================= PAGE LOAD =================
 
-// window.onload -> page load hote hi ye function automatically run hota hai
+// window.onload -> page load hote hi ye function automatically run hotta hai
 // iska use hum yaha localStorage se tasks fetch karke UI me show karne ke liye kar rahe hain
 window.onload = () => {
-    fetchTask()
+ 
+    fetchTask();
 }
 
 
@@ -124,85 +126,34 @@ const fetchTask = () => {
     // Object.keys() se localStorage ki sari keys array me mil jati hain
     const keys = Object.keys(localStorage);
 
-
-    // table ka container select kar rahe hain
-    const taskContainer = document.getElementById("taskContainer")
-
-    // task numbering ke liye counter
-    let i = 1;
-
-    // har key ke liye loop chal raha hai
+    const allData = [];
     for (let key of keys) {
-
-        // key se related task value get kar rahe hain
-        const taskData = JSON.parse(localStorage.getItem(key));
-        console.log(taskData);
-
-        // UI template bana rahe hain
-        const ui = ` 
-        <tr class="border-b hover:bg-blue-50 transition">
-
-            <td class="p-3 font-medium">${i}</td>
-
-            <td class="p-3 ">${taskData.task[0].toUpperCase()}${taskData.task.slice(1)}</td>
-            <td class="p-3">${moment(taskData.date).format('DD MMMM  YYYY')}</td>
-            <td class="p-3">
-            <select onchange="updateStatus(event,'${key}')" class="border border-gray-400 p-1 rounded">
-            <option value="scheduled" ${taskData.status === 'scheduled' ? 'selected' : ''}>Scheduled</option>
-            <option value="inprogress" ${taskData.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
-            <option value="canceled" ${taskData.status === 'canceled' ? 'selected' : ''}>Canceled</option>
-            <option value="complete" ${taskData.status === 'complete' ? 'selected' : ''}>Completed</option>
-            </select>
-            </td>
-
-            <td class="p-3">
-
-                <div class="flex justify-center gap-4 text-lg">
-
-                    <!-- Update Button -->
-                    <button onclick="UpdateTask('${key}')" class="text-blue-600">
-                        <i class="ri-pencil-fill"></i>
-                    </button>
-
-                    <!-- Delete Button -->
-                    <button onclick="removeTask('${key}')" class="text-red-500">
-                        <i class="ri-delete-bin-2-fill"></i>
-                    </button>
-
-                </div>
-
-            </td>
-
-        </tr>
-        `
-
-        // += ka use kar rahe hain taaki purane tasks delete na ho
-        taskContainer.innerHTML += ui
-
-        // index number increase
-        i = i + 1;
+        const data = JSON.parse(localStorage.getItem(key));
+        allData.push({...data, key: key});
     }
 
+    // render all tasks
+    renderTasks(allData);
 }
 
 //this fun created for updatestatus 
-function updateStatus(e,key_id){
- const status = e.target.value
- const StatusData =JSON.parse( localStorage.getItem(key_id))
-StatusData.status=status; 
-localStorage.setItem(key_id,JSON.stringify(StatusData));
-Swal.fire({
-    title:"Status Updated",
-    icon:"success",
-    toast:true,
-    timer:1000,
-    text:status.toUpperCase(),
-    showConfirmButton:false,
-    timerProgressBar:true,
-    position:"top-end"
-})
- console.log(StatusData);
- 
+function updateStatus(e, key_id) {
+    const status = e.target.value
+    const StatusData = JSON.parse(localStorage.getItem(key_id))
+    StatusData.status = status;
+    localStorage.setItem(key_id, JSON.stringify(StatusData));
+    Swal.fire({
+        title: "Status Updated",
+        icon: "success",
+        toast: true,
+        timer: 1000,
+        text: status.toUpperCase(),
+        showConfirmButton: false,
+        timerProgressBar: true,
+        position: "top-end"
+    })
+    console.log(StatusData);
+
 }
 
 // ================= DELETE TASK =================
@@ -279,7 +230,7 @@ function SaveUpdateTask(e, key_id) {
 
     // popup ke input field se value lena
     const inputBox = Swal.getPopup().querySelector("#editTask");
-   const editdate = Swal.getPopup().querySelector("#editdate");
+    const editdate = Swal.getPopup().querySelector("#editdate");
 
     const updateTask = inputBox.value.trim();
 
@@ -317,4 +268,76 @@ function SaveUpdateTask(e, key_id) {
         .then(() => {
             location.reload();
         })
+}
+
+//filder and search fucntinality
+
+const filter = (input) => {
+    const keyword = input.value.trim().toLowerCase()
+    const keys =  Object.keys(localStorage);
+    const allData = [];
+    for (let key of keys) {
+        const data = JSON.parse(localStorage.getItem(key));
+        allData.push({...data, key: key}); // add key for reference
+    }
+
+    let filteredData;
+    if (keyword === '') {
+        filteredData = allData;
+    } else {
+        filteredData = allData.filter((item) => {
+            return item.task.toLowerCase().indexOf(keyword) != -1;
+        });
+    }
+
+    // render filtered tasks
+    renderTasks(filteredData);
+}
+
+const renderTasks = (tasks) => {
+    const taskContainer = document.getElementById("taskContainer");
+    taskContainer.innerHTML = ''; // clear existing
+
+    let i = 1;
+    for (let taskData of tasks) {
+        const ui = ` 
+        <tr class="border-b hover:bg-blue-50 transition">
+
+            <td class="p-3 font-medium">${i}</td>
+
+            <td class="p-3 ">${taskData.task[0].toUpperCase()}${taskData.task.slice(1)}</td>
+            <td class="p-3">${moment(taskData.date).format('DD MMMM  YYYY')}</td>
+            <td class="p-3">
+            <select onchange="updateStatus(event,'${taskData.key}')" class="border border-gray-400 p-1 rounded">
+            <option value="scheduled" ${taskData.status === 'scheduled' ? 'selected' : ''}>Scheduled</option>
+            <option value="inprogress" ${taskData.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+            <option value="canceled" ${taskData.status === 'canceled' ? 'selected' : ''}>Canceled</option>
+            <option value="complete" ${taskData.status === 'complete' ? 'selected' : ''}>Completed</option>
+            </select>
+            </td>
+
+            <td class="p-3">
+
+                <div class="flex justify-center gap-4 text-lg">
+
+                    <!-- Update Button -->
+                    <button onclick="UpdateTask('${taskData.key}')" class="text-blue-600">
+                        <i class="ri-pencil-fill"></i>
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button onclick="removeTask('${taskData.key}')" class="text-red-500">
+                        <i class="ri-delete-bin-2-fill"></i>
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+        `
+
+        taskContainer.innerHTML += ui;
+        i = i + 1;
+    }
 }
