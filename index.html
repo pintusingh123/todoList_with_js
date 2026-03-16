@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet" />
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script src="./index.js" defer></script>
 </head>
 
@@ -43,10 +44,7 @@
             <!-- start form for added task in table  -->
             <div class="w-12/12 flex gap-3 mx-auto mb-6">
                 <!-- Input -->
-                 <input
-                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
-                    type="text" name="task" id="task" placeholder="Search your task...">
-
+               
                 <!-- Button -->
                 <button onclick="OpenPopUP()"
                     class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center gap-1">
@@ -71,12 +69,14 @@
                             <tr>
                                 <th class="p-3 text-sm font-semibold">SN</th>
                                 <th class="p-3 text-sm font-semibold">TASK</th>
+                                <th class="p-3 text-sm font-semibold">Date</th>
+                                <th class="p-3 text-sm font-semibold">Status</th>
                                 <th class="p-3 text-sm font-semibold text-center">ACTIONS</th>
                             </tr>
                         </thead>
 
                         <!-- Table Body -->
-                        <tbody id="taskContainer" class="text-gray-700">  
+                        <tbody id="taskContainer" class="text-gray-700">
                             <!-- we added task here dynamicly -->
                         </tbody>
 

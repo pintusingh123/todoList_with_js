@@ -1,4 +1,4 @@
- // ================= PAGE LOAD =================
+// ================= PAGE LOAD =================
 
 // window.onload -> page load hote hi ye function automatically run hota hai
 // iska use hum yaha localStorage se tasks fetch karke UI me show karne ke liye kar rahe hain
@@ -19,7 +19,7 @@ const OpenPopUP = () => {
               <h1 class="text-xl font-semibold text-black">Add a new Task</h1>
 
           <!-- Task Create Form -->
-          <form onsubmit="createTask(event)" class="flex flex-col md:flex-row mt-2 gap-3">
+          <form onsubmit="createTask(event)" class="flex flex-col  mt-2 gap-3">
 
             <!-- Task Input -->
             <input
@@ -28,6 +28,13 @@ const OpenPopUP = () => {
             name="task"
             id="task"
             placeholder="Enter your task..."
+            >
+            <input
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
+            type="date"
+            name="date"
+            id="date"
+            
             >
 
         <!-- Submit Button -->
@@ -59,14 +66,26 @@ function createTask(e) {
     // SweetAlert popup ke andar se input field select kar rahe hain
     const input = Swal.getPopup().querySelector("#task");
 
+    // SweetAlert popup ke andar se date select kar rhe hai
+    const dateInput = Swal.getPopup().querySelector("#date")
+    // console.log(dateInput);
+
     // input value le rahe hain aur extra spaces remove kar rahe hain
     const task = input.value.trim();
 
+    // date ki value get karna
+    const DateValue = dateInput.value;
     // Date.now() se unique key generate kar rahe hain
     let key = Date.now();
 
+    const payload = JSON.stringify({
+        task: task,
+        date: DateValue,
+        status: "scheduled"
+    })
+
     // localStorage me task save kar rahe hain
-    localStorage.setItem(key, task);
+    localStorage.setItem(key, payload);
 
 
     // agar user empty task submit kare
@@ -105,6 +124,7 @@ const fetchTask = () => {
     // Object.keys() se localStorage ki sari keys array me mil jati hain
     const keys = Object.keys(localStorage);
 
+
     // table ka container select kar rahe hain
     const taskContainer = document.getElementById("taskContainer")
 
@@ -115,7 +135,8 @@ const fetchTask = () => {
     for (let key of keys) {
 
         // key se related task value get kar rahe hain
-        const task = localStorage.getItem(key);
+        const taskData = JSON.parse(localStorage.getItem(key));
+        console.log(taskData);
 
         // UI template bana rahe hain
         const ui = ` 
@@ -123,7 +144,16 @@ const fetchTask = () => {
 
             <td class="p-3 font-medium">${i}</td>
 
-            <td class="p-3">${task}</td>
+            <td class="p-3 ">${taskData.task[0].toUpperCase()}${taskData.task.slice(1)}</td>
+            <td class="p-3">${moment(taskData.date).format('DD MMMM  YYYY')}</td>
+            <td class="p-3">
+            <select onchange="updateStatus(event,'${key}')" class="border border-gray-400 p-1 rounded">
+            <option value="scheduled" ${taskData.status === 'scheduled' ? 'selected' : ''}>Scheduled</option>
+            <option value="inprogress" ${taskData.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+            <option value="canceled" ${taskData.status === 'canceled' ? 'selected' : ''}>Canceled</option>
+            <option value="complete" ${taskData.status === 'complete' ? 'selected' : ''}>Completed</option>
+            </select>
+            </td>
 
             <td class="p-3">
 
@@ -155,7 +185,25 @@ const fetchTask = () => {
 
 }
 
-
+//this fun created for updatestatus 
+function updateStatus(e,key_id){
+ const status = e.target.value
+ const StatusData =JSON.parse( localStorage.getItem(key_id))
+StatusData.status=status; 
+localStorage.setItem(key_id,JSON.stringify(StatusData));
+Swal.fire({
+    title:"Status Updated",
+    icon:"success",
+    toast:true,
+    timer:1000,
+    text:status.toUpperCase(),
+    showConfirmButton:false,
+    timerProgressBar:true,
+    position:"top-end"
+})
+ console.log(StatusData);
+ 
+}
 
 // ================= DELETE TASK =================
 
@@ -178,7 +226,7 @@ const removeTask = (key) => {
 function UpdateTask(key_id) {
 
     // localStorage se current task value le rahe hain
-    let InputValue = localStorage.getItem(key_id)
+    let taskData = JSON.parse(localStorage.getItem(key_id))
 
     new Swal({
 
@@ -188,7 +236,7 @@ function UpdateTask(key_id) {
               <h1 class="text-xl font-semibold text-black">Edit Task</h1>
 
           <!-- Update Form -->
-          <form onsubmit="SaveUpdateTask(event,'${key_id}')" class="flex flex-col md:flex-row mt-2 gap-3">
+          <form onsubmit="SaveUpdateTask(event,'${key_id}')" class="flex flex-col  mt-2 gap-3">
 
             <!-- Input me existing task value show kar rahe hain -->
             <input
@@ -196,7 +244,13 @@ function UpdateTask(key_id) {
             type="text"
             id="editTask"
             placeholder="Update your task..."
-            value="${InputValue}"
+            value="${taskData.task}"
+            >
+            <input
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+            type="date"
+            id="editdate"
+            value="${taskData.date}"
             >
 
         <!-- Save Button -->
@@ -225,6 +279,7 @@ function SaveUpdateTask(e, key_id) {
 
     // popup ke input field se value lena
     const inputBox = Swal.getPopup().querySelector("#editTask");
+   const editdate = Swal.getPopup().querySelector("#editdate");
 
     const updateTask = inputBox.value.trim();
 
@@ -240,8 +295,13 @@ function SaveUpdateTask(e, key_id) {
         return
     }
 
-    // same key me new value update kar rahe hain
-    localStorage.setItem(key_id, updateTask);
+    // existing data parse karo aur task update karo
+    let taskData = JSON.parse(localStorage.getItem(key_id));
+    taskData.task = updateTask;
+    taskData.date = editdate.value;
+
+    // same key me updated JSON object save karo
+    localStorage.setItem(key_id, JSON.stringify(taskData));
 
     // success message
     Swal.fire({
